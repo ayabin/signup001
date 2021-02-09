@@ -48,23 +48,31 @@ class MainPage extends StatelessWidget {
   }
 }
 
-class _CustomeTextField extends StatelessWidget {
+class _CustomeTextField extends StatefulWidget {
   final String labelText;
   final String hintText;
   final bool obscureText;
+  final TextEditingController controller;
   const _CustomeTextField({
     Key key,
     @required this.labelText,
     @required this.hintText,
     @required this.obscureText,
+    @required this.controller,
   }) : super(key: key);
 
   @override
+  __CustomeTextFieldState createState() => __CustomeTextFieldState();
+}
+
+class __CustomeTextFieldState extends State<_CustomeTextField> {
+  @override
   Widget build(BuildContext context) {
     return TextField(
+      controller: widget.controller,
       decoration: InputDecoration(
-        labelText: labelText,
-        hintText: hintText,
+        labelText: widget.labelText,
+        hintText: widget.hintText,
         hintStyle: TextStyle(color: kTextColorSecondary),
         floatingLabelBehavior: FloatingLabelBehavior.always,
         focusedBorder: OutlineInputBorder(
@@ -80,32 +88,33 @@ class _CustomeTextField extends StatelessWidget {
           ),
         ),
       ),
-      obscureText: obscureText,
-      onTap: () {
-        print('TextField Tap');
-      },
-      onChanged: (String value) {
-        print(value);
-      },
+      obscureText: widget.obscureText,
     );
   }
 }
 
 class _SignInForm extends StatelessWidget {
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
+    String _email = "";
+    String _password = "";
     return Column(
       children: [
         _CustomeTextField(
           labelText: 'Email',
           hintText: 'your email address goes here',
           obscureText: false,
+          controller: _emailController,
         ),
         SizedBox(height: 48),
         _CustomeTextField(
           labelText: 'Password',
           hintText: 'your password goes here',
           obscureText: true,
+          controller: _passwordController,
         ),
         SizedBox(height: 4),
         Text(
@@ -131,37 +140,39 @@ class _SignInForm extends StatelessWidget {
                   .copyWith(color: kButtonTextColorPrimary, fontSize: 18),
             ),
             onPressed: () async {
-              // SignUp
+              _email = _emailController.text;
+              _password = _passwordController.text;
 
-              // try {
-              //   UserCredential userCredential = await FirebaseAuth.instance
-              //       .createUserWithEmailAndPassword(
-              //           email: "ayabin.jp@gmail.com", password: "Password");
-              //   print(userCredential);
-              // } on FirebaseAuthException catch (e) {
-              //   if (e.code == 'weak-password') {
-              //     print('The Password provides is too weak');
-              //   } else if (e.code == 'emami-already-in-use') {
-              //     print('The account already exists for that email.');
-              //   }
-              // } catch (e) {
-              //   print(e);
-              // }
+              // SignUp
+              try {
+                UserCredential userCredential = await FirebaseAuth.instance
+                    .createUserWithEmailAndPassword(
+                        email: _email, password: _password);
+                print(userCredential);
+              } on FirebaseAuthException catch (e) {
+                if (e.code == 'weak-password') {
+                  print('The Password provides is too weak');
+                } else if (e.code == 'emami-already-in-use') {
+                  print('The account already exists for that email.');
+                }
+              } catch (e) {
+                print(e);
+              }
 
               // SingIn
 
-              try {
-                UserCredential userCredential = await FirebaseAuth.instance
-                    .signInWithEmailAndPassword(
-                        email: 'ayabin.jp@gmail.com', password: 'Password');
-                print(userCredential.user.email);
-              } on FirebaseAuthException catch (e) {
-                if (e.code == 'user-not-found') {
-                  print('No User for that email.');
-                } else if (e.code == 'wrong-password') {
-                  print('Wrong password provided for that user.');
-                }
-              }
+              // try {
+              //   UserCredential userCredential = await FirebaseAuth.instance
+              //       .signInWithEmailAndPassword(
+              //           email: 'ayabin.jp@gmail.com', password: 'Password');
+              //   print(userCredential.user.email);
+              // } on FirebaseAuthException catch (e) {
+              //   if (e.code == 'user-not-found') {
+              //     print('No User for that email.');
+              //   } else if (e.code == 'wrong-password') {
+              //     print('Wrong password provided for that user.');
+              //   }
+              // }
             },
           ),
         ),
