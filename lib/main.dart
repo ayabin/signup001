@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 const String title = 'SignUp by Firebase';
@@ -10,7 +11,9 @@ const Color kButtonColorPrimary = Color(0xFFECEFF1);
 const Color kButtonTextColorPrimary = Color(0xFF455A64);
 const Color kIconColor = Color(0xFF455A64);
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(MyApp());
 }
 
@@ -127,8 +130,38 @@ class _SignInForm extends StatelessWidget {
                   .button
                   .copyWith(color: kButtonTextColorPrimary, fontSize: 18),
             ),
-            onPressed: () {
-              print('Sign Up');
+            onPressed: () async {
+              // SignUp
+
+              // try {
+              //   UserCredential userCredential = await FirebaseAuth.instance
+              //       .createUserWithEmailAndPassword(
+              //           email: "ayabin.jp@gmail.com", password: "Password");
+              //   print(userCredential);
+              // } on FirebaseAuthException catch (e) {
+              //   if (e.code == 'weak-password') {
+              //     print('The Password provides is too weak');
+              //   } else if (e.code == 'emami-already-in-use') {
+              //     print('The account already exists for that email.');
+              //   }
+              // } catch (e) {
+              //   print(e);
+              // }
+
+              // SingIn
+
+              try {
+                UserCredential userCredential = await FirebaseAuth.instance
+                    .signInWithEmailAndPassword(
+                        email: 'ayabin.jp@gmail.com', password: 'Password');
+                print(userCredential.user.email);
+              } on FirebaseAuthException catch (e) {
+                if (e.code == 'user-not-found') {
+                  print('No User for that email.');
+                } else if (e.code == 'wrong-password') {
+                  print('Wrong password provided for that user.');
+                }
+              }
             },
           ),
         ),
