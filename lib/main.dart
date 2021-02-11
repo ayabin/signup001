@@ -104,7 +104,13 @@ class _LoginForm extends StatelessWidget {
                 controller: _passwordController,
               ),
               TextButton(
-                onPressed: () {},
+                onPressed: () {
+                  AuthService as = AuthService(
+                      email: _emailController.text,
+                      password: _passwordController.text);
+                  Future uc = as.sendPasswordResetEmail();
+                  print(uc);
+                },
                 child: Text(
                   'Forgot Password ?',
                   style: Theme.of(context)
